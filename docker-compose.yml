@@ -1,0 +1,61 @@
+services:
+  db:
+    image: mysql:8.0.45-debian
+    container_name: mysql_furnitureshop
+    environment:
+      MYSQL_ROOT_PASSWORD: Tun_IT16012004@
+      MYSQL_DATABASE: furnitureshop
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - backend_network
+    restart: unless-stopped
+
+  redis:
+    image: redis:trixie
+    container_name: redis_furnitureshop
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend_network
+    restart: unless-stopped
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight_furnitureshop
+    ports:
+      - "5540:5540"
+    volumes:
+      - redisinsight:/data
+    networks:
+      - backend_network
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: rabbitmq_furnitureshop
+    environment:
+      RABBITMQ_DEFAULT_USER: htung@2004
+      RABBITMQ_DEFAULT_PASS: Tun_IT16012004@rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - backend_network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  redis_data:
+  redisinsight:
+  rabbitmq_data:
+
+networks:
+  backend_network:
+    driver: bridge
