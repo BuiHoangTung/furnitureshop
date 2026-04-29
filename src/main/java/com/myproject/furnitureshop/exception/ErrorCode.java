@@ -6,6 +6,9 @@ public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION("SYS-UNCAT-EXC", "Uncategorized error.", HttpStatus.BAD_REQUEST),
     INVALID_KEY_VALIDATION_EXCEPTION("SYS-VAL-KEY", "Invalid error field message key.", HttpStatus.INTERNAL_SERVER_ERROR),
 
+    /* Rate limit */
+    MANY_REQUEST("RATE-LIM-BUS-001", "Rate limit exceeded for this endpoint", HttpStatus.TOO_MANY_REQUESTS),
+
     /* Validation */
     VALIDATION_ERROR("VAL-BUS-001", "Validation failed.", HttpStatus.BAD_REQUEST),
 
@@ -46,6 +49,7 @@ public enum ErrorCode {
     AUTHENTICATION_REQUIRED("AUTH-BUS-004", "Authentication is required to access this resource.", HttpStatus.UNAUTHORIZED),
     ACCESS_DENIED("AUTH-BUS-005", "You do not have permission to perform this action.", HttpStatus.FORBIDDEN),
     TOKEN_REVOKED("AUTH-BUS-006", "Token already revoked.", HttpStatus.BAD_REQUEST),
+    USER_ALREADY_LOGGED_IN("AUTH-BUS-007", "User is already logged in.", HttpStatus.BAD_REQUEST),
 
     JWT_REFRESH_TOKEN_REQUIRED("JWT-VAL-001", "Refresh token is mandatory.", HttpStatus.BAD_REQUEST),
     JWT_TOKEN_REQUIRED("JWT-VAL-002", "Access token is mandatory.", HttpStatus.BAD_REQUEST),

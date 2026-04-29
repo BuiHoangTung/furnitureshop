@@ -12,6 +12,7 @@ import com.myproject.furnitureshop.mapper.UserMapper;
 import com.myproject.furnitureshop.repository.UserRepository;
 import com.myproject.furnitureshop.service.RoleService;
 import com.myproject.furnitureshop.service.UserService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -61,6 +62,7 @@ public class UserServiceImp implements UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
+    @PreAuthorize("hasAuthority('USER_UPDATE')")
     @Override
     @Transactional
     public AssignRoleResponse toggleAssignRole(long id, AssignRoleRequest request) {

@@ -6,6 +6,6 @@ import jakarta.validation.constraints.NotNull;
 public record JwtRefreshTokenRequest(
         @NotNull(message = "JWT_REFRESH_TOKEN_REQUIRED")
         @NotBlank(message = "JWT_REFRESH_TOKEN_REQUIRED")
-        String refreshToken
+        String urt
 ) {
 }
