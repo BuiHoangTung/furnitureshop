@@ -4,6 +4,7 @@ import com.myproject.furnitureshop.dto.request.AssignPermissionRequest;
 import com.myproject.furnitureshop.dto.request.RoleCreationRequest;
 import com.myproject.furnitureshop.dto.response.RoleResponse;
 import com.myproject.furnitureshop.dto.response.SuccessResponse;
+import com.myproject.furnitureshop.ratelimit.RateLimit;
 import com.myproject.furnitureshop.service.RoleService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ public class RoleController {
         this.roleService = roleService;
     }
 
+    @RateLimit(requests = 50)
     @PostMapping
     public ResponseEntity<SuccessResponse<RoleResponse>> createRole(@Valid @RequestBody RoleCreationRequest roleCreationRequest) {
         RoleResponse roleResponse = this.roleService.createRole(roleCreationRequest);
@@ -29,6 +31,7 @@ public class RoleController {
         return ResponseEntity.ok().body(successResponse);
     }
 
+    @RateLimit
     @GetMapping
     public ResponseEntity<SuccessResponse<List<RoleResponse>>> getAllRoles() {
         List<RoleResponse> roleResponseList = this.roleService.getAllRoles();
@@ -38,6 +41,7 @@ public class RoleController {
         return ResponseEntity.ok().body(successResponse);
     }
 
+    @RateLimit(requests = 5)
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteRole(@PathVariable long id) {
         this.roleService.deleteRoleByRoleId(id);
@@ -47,6 +51,7 @@ public class RoleController {
         return ResponseEntity.ok().body(response);
     }
 
+    @RateLimit(requests = 50)
     @PostMapping("/assign-permission/{id}")
     public ResponseEntity<?> toggleAssignPermissions(@PathVariable long id, @RequestBody AssignPermissionRequest request) {
         RoleResponse roleResponse = this.roleService.ToggleAssignPermissionsToRole(id, request.permissions());

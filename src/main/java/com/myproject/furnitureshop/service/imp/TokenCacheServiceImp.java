@@ -13,8 +13,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class TokenCacheServiceImp implements TokenCacheService {
-    private static final String DEFAULT_VALUE = "whitelisted";
-    private static final String PREFIX_KEY = "jwt:jti:";
+    private static final String PREFIX_KEY = "rt:jti:";
 
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -34,12 +33,12 @@ public class TokenCacheServiceImp implements TokenCacheService {
     }
 
     @Override
-    public void cacheWhiteListRefreshToken(String jti, Date exp) {
+    public void cacheWhiteListRefreshToken(String jti, Date exp, String token) {
         long ttl = this.setTtl(exp);
 
         if(ttl <= 0) return;
 
-        this.redisTemplate.opsForValue().set(this.builtRedisKey(jti), DEFAULT_VALUE, ttl, TimeUnit.MILLISECONDS);
+        this.redisTemplate.opsForValue().set(this.builtRedisKey(jti), token, ttl, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -47,19 +46,4 @@ public class TokenCacheServiceImp implements TokenCacheService {
         return Boolean.TRUE
                 .equals(this.redisTemplate.delete(this.builtRedisKey(jti)));
     }
-
-//    @Override
-//    public boolean isValidRefreshToken(String jti) {
-//        String redisKey = this.builtRedisKey(jti);
-//
-//        return this.redisTemplate.hasKey(redisKey);
-//    }
-//
-//    @Override
-//    public void invalidatedRefreshToken(String jti) {
-//        String redisKey = this.builtRedisKey(jti);
-//
-//        Boolean deleted = this.redisTemplate.delete(redisKey);
-//        log.info("Invalidate role cache | keys={} | deleted={}", redisKey, deleted);
-//    }
 }

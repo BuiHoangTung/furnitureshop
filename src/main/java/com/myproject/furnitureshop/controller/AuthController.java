@@ -5,8 +5,10 @@ import com.myproject.furnitureshop.dto.response.AuthResponse;
 import com.myproject.furnitureshop.dto.response.JwtResponse;
 import com.myproject.furnitureshop.dto.response.SuccessResponse;
 import com.myproject.furnitureshop.dto.response.TurnstileResponse;
+import com.myproject.furnitureshop.enums.RateLimitType;
 import com.myproject.furnitureshop.exception.AppException;
 import com.myproject.furnitureshop.exception.ErrorCode;
+import com.myproject.furnitureshop.ratelimit.DistributedRateLimiterService;
 import com.myproject.furnitureshop.service.AuthService;
 import com.myproject.furnitureshop.service.TurnstileService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +19,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -24,13 +28,16 @@ public class AuthController {
     private final TurnstileService turnstileService;
     private final AuthService authService;
     private final AuthenticationManager authenticationManager;
+    private final DistributedRateLimiterService rateLimiterService;
 
     public AuthController(TurnstileService turnstileService,
                           AuthService authService,
-                          AuthenticationManager authenticationManager) {
+                          AuthenticationManager authenticationManager,
+                          DistributedRateLimiterService rateLimiterService) {
         this.turnstileService = turnstileService;
         this.authService = authService;
         this.authenticationManager = authenticationManager;
+        this.rateLimiterService = rateLimiterService;
     }
 
     @PostMapping("/signup/email")
@@ -67,6 +74,8 @@ public class AuthController {
 
     @PostMapping
     public ResponseEntity<SuccessResponse<JwtResponse>> authen(@Valid @RequestBody AuthRequest authRequest) {
+        this.rateLimiterService.handleRateLimit(RateLimitType.AUTH.getType() + ":" + authRequest.email(), 10, Duration.ofMinutes(1L));
+
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                 new UsernamePasswordAuthenticationToken(authRequest.email(), authRequest.password());
 
@@ -93,6 +102,8 @@ public class AuthController {
 
     @PostMapping("/refresh-token")
     public ResponseEntity<SuccessResponse<JwtResponse>> refreshAccessToken(@Valid @RequestBody JwtRefreshTokenRequest request) {
+        this.rateLimiterService.handleRateLimit(RateLimitType.REFRESH_TOKEN.getType() + ":" + request.urt(), 10, Duration.ofMinutes(1L));
+
         JwtResponse jwtResponse = this.authService.refreshToken(request);
 
         SuccessResponse<JwtResponse> response = SuccessResponse.of("Refresh token successfully.", jwtResponse);
@@ -100,17 +111,3 @@ public class AuthController {
         return ResponseEntity.ok().body(response);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

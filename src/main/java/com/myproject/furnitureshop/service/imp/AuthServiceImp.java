@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 @Service
 public class AuthServiceImp implements AuthService {
     private static final String OTP_SUCCESS_VERIFICATION = "otp:verified:";
+    private static final String PREFIX_KEY = "rt:jti:";
 
     private final UserService userService;
     private final OtpService otpService;
@@ -126,11 +127,11 @@ public class AuthServiceImp implements AuthService {
         JwtToken accessToken = this.jwtHelper.generateToken(this.objectMapper.writeValueAsString(authResponse), false);
         JwtToken refreshToken = this.jwtHelper.generateToken(String.valueOf(authResponse.getUserId()), true);
 
-        this.tokenCacheService.cacheWhiteListRefreshToken(refreshToken.getJti(), refreshToken.getExp());
+        this.tokenCacheService.cacheWhiteListRefreshToken(refreshToken.getJti(), refreshToken.getExp(), refreshToken.getToken());
 
         return JwtResponse.builder()
                 .accessToken(accessToken.getToken())
-                .refreshToken(refreshToken.getToken())
+                .refreshToken(refreshToken.getJti())
                 .build();
     }
 
@@ -167,7 +168,13 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public JwtResponse refreshToken(JwtRefreshTokenRequest refreshTokenRequest) {
-        String token = refreshTokenRequest.refreshToken();
+        String urt = refreshTokenRequest.urt();
+        String token = this.redisTemplate.opsForValue().get(PREFIX_KEY + urt);
+
+        if(token == null) {
+            throw new AppException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
         Jws<Claims> claimsJws = this.jwtHelper.getJws(token);
         String sub = claimsJws.getPayload().getSubject();
         String jti = claimsJws.getPayload().getId();
@@ -206,11 +213,11 @@ public class AuthServiceImp implements AuthService {
         JwtToken newAccessToken = this.jwtHelper.generateToken(this.objectMapper.writeValueAsString(response), false);
         JwtToken newRefreshToken = this.jwtHelper.generateToken(String.valueOf(userEntity.getId()), true);
 
-        this.tokenCacheService.cacheWhiteListRefreshToken(newRefreshToken.getJti(), newRefreshToken.getExp());
+        this.tokenCacheService.cacheWhiteListRefreshToken(newRefreshToken.getJti(), newRefreshToken.getExp(), newRefreshToken.getToken());
 
         return JwtResponse.builder()
                 .accessToken(newAccessToken.getToken())
-                .refreshToken(newRefreshToken.getToken())
+                .refreshToken(newRefreshToken.getJti())
                 .build();
     }
 }

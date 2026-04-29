@@ -3,6 +3,7 @@ package com.myproject.furnitureshop.controller;
 import com.myproject.furnitureshop.dto.request.PermissionCreationRequest;
 import com.myproject.furnitureshop.dto.response.PermissionResponse;
 import com.myproject.furnitureshop.dto.response.SuccessResponse;
+import com.myproject.furnitureshop.ratelimit.RateLimit;
 import com.myproject.furnitureshop.service.PermissionService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,8 @@ public class PermissionController {
         this.permissionService = permissionService;
     }
 
+
+    @RateLimit(requests = 50)
     @PostMapping
     public ResponseEntity<SuccessResponse<PermissionResponse>> createPermission(@Valid @RequestBody PermissionCreationRequest request) {
         PermissionResponse permissionResponse = this.permissionService.createPermission(request);
@@ -29,6 +32,7 @@ public class PermissionController {
         return ResponseEntity.ok().body(response);
     }
 
+    @RateLimit
     @GetMapping
     public ResponseEntity<?> getAllPermissions() {
         List<PermissionResponse> permissionResponseList = this.permissionService.getAllPermissions();
@@ -37,6 +41,7 @@ public class PermissionController {
         return ResponseEntity.ok().body(response);
     }
 
+    @RateLimit(requests = 5)
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePermission(@PathVariable long id) {
         this.permissionService.deletePermissionByPermissionId(id);
