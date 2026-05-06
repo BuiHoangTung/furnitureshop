@@ -172,6 +172,22 @@
             <artifactId>bucket4j-redis</artifactId>
             <version>8.9.0</version>
         </dependency>
+
+        <!-- Source: https://mvnrepository.com/artifact/org.apache.tika/tika-core -->
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>3.3.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Source: https://mvnrepository.com/artifact/xyz.capybara/clamav-client -->
+        <dependency>
+            <groupId>xyz.capybara</groupId>
+            <artifactId>clamav-client</artifactId>
+            <version>2.1.2</version>
+            <scope>compile</scope>
+        </dependency>
 	</dependencies>
 
 	<build>
