@@ -62,6 +62,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers("/api/auth/**", "/api/otp/**").permitAll();
                     request.requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll();
+                    request.requestMatchers(HttpMethod.GET, "/api/files/**").permitAll();
                     request.anyRequest().authenticated();
                 })
                 .addFilterBefore(customFilter, AuthenticationFilter.class)

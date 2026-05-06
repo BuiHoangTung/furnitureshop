@@ -6,6 +6,11 @@ public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION("SYS-UNCAT-EXC", "Uncategorized error.", HttpStatus.BAD_REQUEST),
     INVALID_KEY_VALIDATION_EXCEPTION("SYS-VAL-KEY", "Invalid error field message key.", HttpStatus.INTERNAL_SERVER_ERROR),
 
+    FIELD_NO_REDUNDANCY_WHITE_SPACE("FIELD-VAL-001", "Must not contain leading or trailing whitespace.", HttpStatus.BAD_REQUEST),
+    FIELD_NO_BLANK("FIELD-VAL-002", "This field can not be blank.", HttpStatus.BAD_REQUEST),
+    FIELD_INVALID_FORMAT("FIELD-VAL-003", "Field format is invalid.", HttpStatus.BAD_REQUEST),
+
+
     /* Rate limit */
     MANY_REQUEST("RATE-LIM-BUS-001", "Rate limit exceeded for this endpoint", HttpStatus.TOO_MANY_REQUESTS),
 
@@ -66,7 +71,34 @@ public enum ErrorCode {
     OTP_VERIFICATION_INVALID("OTP-SYS-007", "OTP verification is invalid or expired.", HttpStatus.BAD_REQUEST),
 
     /* External API failures, payment gateway, 3rd-party service issues */
-    TURNSTILE_INVALID_TOKEN("TURNSTILE-INT-001", "Token timeout or duplicate", HttpStatus.BAD_REQUEST)
+    TURNSTILE_INVALID_TOKEN("TURNSTILE-INT-001", "Token timeout or duplicate", HttpStatus.BAD_REQUEST),
+
+    /* Category domain exception */
+    CAT_PARENT_REQUIRED("CAT-BUS-001", "Category parent is mandatory.", HttpStatus.BAD_REQUEST),
+    CAT_NOT_FOUND("CAT-BUS-002", "Category not found.", HttpStatus.BAD_REQUEST),
+    CAT_INVALID_PARENT_LEVEL("CAT-BUS-003", "Invalid parent category level.", HttpStatus.BAD_REQUEST),
+    CAT_ALREADY_EXISTS("CAT-BUS-004", "Category already exists.", HttpStatus.BAD_REQUEST),
+    CAT_PARENT_NOT_FOUND("CAT-BUS-005", "Category parent not found.", HttpStatus.BAD_REQUEST),
+    CAT_ONLY_ACTIVE("CAT-BUS-006", "Operation allowed only when category status is ACTIVE.", HttpStatus.CONFLICT),
+
+    CATEGORY_NAME_REQUIRED("CAT-VAL-001", "Name of category is mandatory.", HttpStatus.BAD_REQUEST),
+    CATEGORY_LEVEL_REQUIRED("CAT-VAL-002", "Level of category is mandatory.", HttpStatus.BAD_REQUEST),
+    CAT_INVALID_LEVEL("CAT-VAL-003", "Invalid level.", HttpStatus.BAD_REQUEST),
+    CAT_IDENTIFIER_REQUIRED("CAT-VAL-004", "Category identifier is mandatory.", HttpStatus.BAD_REQUEST),
+
+    /* File domain exception */
+    FILE_VIRUS_DETECTED("FILE-BUS-001", "Virus detected.", HttpStatus.BAD_REQUEST),
+    INVALID_FILE_PATH("FILE-BUS-002", "Invalid file path.", HttpStatus.INTERNAL_SERVER_ERROR),
+    FILE_STORAGE_ERROR("FILE-BUS-003", "Failed to store file", HttpStatus.INTERNAL_SERVER_ERROR),
+    FILE_NOT_FOUND("FILE-BUS-004", "File not found.", HttpStatus.BAD_REQUEST),
+    INVALID_URL_FILE("FILE-BUS-005", "Invalid file URL format.", HttpStatus.BAD_REQUEST),
+    FILE_ACCESS_DENIED("FILE-BUS-006", "You do not have permission to access this file.", HttpStatus.FORBIDDEN),
+    FILE_DELETE_FAILED("FILE-BUS-007", "Failed to delete file due to internal error.", HttpStatus.INTERNAL_SERVER_ERROR),
+    FILE_READ_ERROR("FILE-BUS-008", "Failed to read file.", HttpStatus.INTERNAL_SERVER_ERROR),
+
+    INVALID_FILE_TYPE("FILE-VAL-001", "Invalid file type.", HttpStatus.BAD_REQUEST),
+    INVALID_FILE_SIZE("FILE-VAL-002", "Invalid file size.", HttpStatus.BAD_REQUEST),
+    FILE_REQUIRED("FILE-VAL-003", "File upload can not be null.", HttpStatus.BAD_REQUEST)
 
     ;
     ErrorCode(String errorCode, String message, HttpStatus httpStatus) {
