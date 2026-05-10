@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -48,6 +49,6 @@ public class CategoryEntity {
     @JoinColumn(name = "parent_id")
     private CategoryEntity parent;
 
-    @OneToMany(mappedBy = "parent")
-    private List<CategoryEntity> children;
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
+    private List<CategoryEntity> children = new ArrayList<>();
 }

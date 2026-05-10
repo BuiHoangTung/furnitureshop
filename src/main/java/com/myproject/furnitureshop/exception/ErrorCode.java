@@ -80,6 +80,7 @@ public enum ErrorCode {
     CAT_ALREADY_EXISTS("CAT-BUS-004", "Category already exists.", HttpStatus.BAD_REQUEST),
     CAT_PARENT_NOT_FOUND("CAT-BUS-005", "Category parent not found.", HttpStatus.BAD_REQUEST),
     CAT_ONLY_ACTIVE("CAT-BUS-006", "Operation allowed only when category status is ACTIVE.", HttpStatus.CONFLICT),
+    CAT_ALREADY_DELETED("CAT-BUS-007", "Categories already deleted.", HttpStatus.BAD_REQUEST),
 
     CATEGORY_NAME_REQUIRED("CAT-VAL-001", "Name of category is mandatory.", HttpStatus.BAD_REQUEST),
     CATEGORY_LEVEL_REQUIRED("CAT-VAL-002", "Level of category is mandatory.", HttpStatus.BAD_REQUEST),

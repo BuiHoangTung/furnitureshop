@@ -1,18 +1,17 @@
 package com.myproject.furnitureshop.service.imp;
 
-import com.myproject.furnitureshop.dto.request.CategoryCreationRequest;
-import com.myproject.furnitureshop.dto.request.CategoryFileUpdateRequest;
-import com.myproject.furnitureshop.dto.request.CategoryFileUploadRequest;
-import com.myproject.furnitureshop.dto.request.CategoryInfoUpdateRequest;
+import com.myproject.furnitureshop.dto.request.*;
 import com.myproject.furnitureshop.dto.response.CategoryCreationResponse;
 import com.myproject.furnitureshop.dto.response.CategoryFileUploadResponse;
 import com.myproject.furnitureshop.dto.response.CategoryInfoUpdateResponse;
+import com.myproject.furnitureshop.dto.response.CategoryNode;
 import com.myproject.furnitureshop.entity.CategoryEntity;
 import com.myproject.furnitureshop.enums.BusinessDirectoryPath;
 import com.myproject.furnitureshop.enums.CategoryLevel;
 import com.myproject.furnitureshop.enums.CategoryStatus;
 import com.myproject.furnitureshop.exception.AppException;
 import com.myproject.furnitureshop.exception.ErrorCode;
+import com.myproject.furnitureshop.mapper.CategoryMapper;
 import com.myproject.furnitureshop.repository.CategoryRepository;
 import com.myproject.furnitureshop.service.CategoryService;
 import com.myproject.furnitureshop.service.FileStorageService;
@@ -23,7 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -31,22 +30,20 @@ public class CategoryServiceImp implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final FileStorageService fileStorageService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final CategoryMapper categoryMapper;
 
     public CategoryServiceImp(CategoryRepository categoryRepository,
                               FileStorageService fileStorageService,
-                              ApplicationEventPublisher applicationEventPublisher) {
+                              ApplicationEventPublisher applicationEventPublisher,
+                              CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
         this.fileStorageService = fileStorageService;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.categoryMapper = categoryMapper;
     }
 
     private CategoryEntity findCategoryById(long id) {
         return this.categoryRepository.findCategoryEntityById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.CAT_NOT_FOUND));
-    }
-
-    private CategoryEntity findCategoryByName(String name) {
-        return this.categoryRepository.findCategoryEntityByName(name)
                 .orElseThrow(() -> new AppException(ErrorCode.CAT_NOT_FOUND));
     }
 
@@ -211,12 +208,112 @@ public class CategoryServiceImp implements CategoryService {
     public void softDeleteCategory(long id) {
         CategoryEntity categoryEntity = this.findCategoryById(id);
 
+        if(categoryEntity.getStatus() == CategoryStatus.DELETED) {
+            throw new AppException(ErrorCode.CAT_ALREADY_DELETED);
+        }
+
         categoryEntity.setStatus(CategoryStatus.DELETED);
-        this.categoryRepository.save(categoryEntity);
+
+        List<CategoryEntity> children = this.categoryRepository.findAllChildrenCategoryEntity(id);
+        children.forEach(child -> {
+            if (child.getStatus() != CategoryStatus.DELETED) {
+                child.setStatus(CategoryStatus.DELETED);
+            }
+        });
     }
 
     @Override
     public void hardDeleteCategory(long id) { // Relate to Products
+    }
 
+    @Override
+    public void activateCategory(long id) { // Relate to Products
+
+    }
+
+    private CategoryNode dfs(CategoryEntity categoryEntity) {
+        if(categoryEntity == null) {
+            return null;
+        }
+
+        CategoryNode node = this.categoryMapper.toCategoryNode(categoryEntity);
+
+        for(CategoryEntity child : categoryEntity.getChildren()) {
+            node.getChildren().add(dfs(child));
+        }
+
+        return node;
+    }
+
+    private CategoryNode buildOnlyActiveTree(CategoryNode rootNode, List<CategoryEntity> children) {
+        Map<Long, CategoryNode> map = new HashMap<>();
+        map.put(rootNode.getId(), rootNode);
+
+        for(CategoryEntity child : children) {
+            if(child.getStatus() == CategoryStatus.ACTIVE) {
+                long parentId = child.getParent().getId();
+                if(map.containsKey(parentId)) {
+                    CategoryNode childNode = this.categoryMapper.toCategoryNode(child);
+                    map.get(parentId).getChildren().add(childNode);
+                    map.put(child.getId(), childNode);
+                }
+            }
+        }
+
+        return rootNode;
+    }
+
+    @PreAuthorize("hasAuthority('CATEGORY_READ')")
+    @Override
+    public CategoryNode getCategoryHierarchy(String name) {
+        CategoryEntity parentEntity = this.categoryRepository.findCategoryEntityByName(name)
+                .orElseThrow(() -> new AppException(ErrorCode.CAT_NOT_FOUND));
+
+        if(parentEntity.getStatus() != CategoryStatus.ACTIVE) {
+            throw new AppException(ErrorCode.CAT_NOT_FOUND);
+        }
+
+        return this.dfs(parentEntity);
+    }
+
+    @Transactional
+    @Override
+    public CategoryNode getOnlyActiveCategoryHierarchy(String name) {
+        CategoryEntity parentEntity = this.categoryRepository.findCategoryEntityByName(name)
+                .orElseThrow(() -> new AppException(ErrorCode.CAT_NOT_FOUND));
+
+        if(parentEntity.getStatus() != CategoryStatus.ACTIVE) {
+            throw new AppException(ErrorCode.CAT_NOT_FOUND);
+        }
+
+        List<CategoryEntity> children = this.categoryRepository.findAllChildrenCategoryEntity(parentEntity.getId());
+
+        return this.buildOnlyActiveTree(this.categoryMapper.toCategoryNode(parentEntity), children);
+    }
+
+    @Override
+    public List<CategoryNode> getOnlyActiveRootCategories() {
+        return this.categoryRepository
+                .findCategoryEntitiesByLevel(CategoryLevel.ROOT)
+                .stream()
+                .filter((category) -> category.getStatus() == CategoryStatus.ACTIVE)
+                .map(this.categoryMapper::toCategoryNode)
+                .toList();
+    }
+
+    @PreAuthorize("hasAuthority('CATEGORY_READ')")
+    @Override
+    public List<CategoryNode> getCategoriesByLevel(String level) {
+        CategoryLevel categoryLevel;
+
+        try {
+            categoryLevel = CategoryLevel.valueOf(level);
+
+            return this.categoryRepository.findCategoryEntitiesByLevel(categoryLevel)
+                    .stream().map(this.categoryMapper::toCategoryNode)
+                    .toList();
+        } catch(Exception e) {
+            throw new AppException(ErrorCode.CAT_INVALID_LEVEL);
+        }
     }
 }

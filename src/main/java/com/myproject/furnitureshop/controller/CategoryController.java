@@ -1,18 +1,14 @@
 package com.myproject.furnitureshop.controller;
 
-import com.myproject.furnitureshop.dto.request.CategoryCreationRequest;
-import com.myproject.furnitureshop.dto.request.CategoryFileUpdateRequest;
-import com.myproject.furnitureshop.dto.request.CategoryFileUploadRequest;
-import com.myproject.furnitureshop.dto.request.CategoryInfoUpdateRequest;
-import com.myproject.furnitureshop.dto.response.CategoryCreationResponse;
-import com.myproject.furnitureshop.dto.response.CategoryFileUploadResponse;
-import com.myproject.furnitureshop.dto.response.CategoryInfoUpdateResponse;
-import com.myproject.furnitureshop.dto.response.SuccessResponse;
+import com.myproject.furnitureshop.dto.request.*;
+import com.myproject.furnitureshop.dto.response.*;
 import com.myproject.furnitureshop.ratelimit.RateLimit;
 import com.myproject.furnitureshop.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/categories")
@@ -82,5 +78,39 @@ public class CategoryController {
         this.categoryService.softDeleteCategory(id);
 
         return ResponseEntity.ok().body(SuccessResponse.of("Soft delete category successfully.", null));
+    }
+
+    @RateLimit
+    @GetMapping("/{name}")
+    public ResponseEntity<SuccessResponse<CategoryNode>> getCategories(@PathVariable String name) {
+        SuccessResponse<CategoryNode> response = SuccessResponse.of("successful.", this.categoryService.getCategoryHierarchy(name));
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @RateLimit
+    @GetMapping("active/{name}")
+    public ResponseEntity<SuccessResponse<CategoryNode>> getOnlyActiveCategories(@PathVariable String name) {
+        SuccessResponse<CategoryNode> response = SuccessResponse.of("Successful.", this.categoryService.getOnlyActiveCategoryHierarchy(name));
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @RateLimit
+    @GetMapping("/root")
+    public ResponseEntity<SuccessResponse<List<CategoryNode>>> getOnlyActiveRootCategories() {
+        SuccessResponse<List<CategoryNode>> response =
+                SuccessResponse.of("Successful.", this.categoryService.getOnlyActiveRootCategories());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @RateLimit
+    @GetMapping
+    public ResponseEntity<SuccessResponse<List<CategoryNode>>> getCategoryByLevel(@RequestParam String level) {
+        SuccessResponse<List<CategoryNode>> response =
+                SuccessResponse.of("Successful.", this.categoryService.getCategoriesByLevel(level));
+
+        return ResponseEntity.ok().body(response);
     }
 }
