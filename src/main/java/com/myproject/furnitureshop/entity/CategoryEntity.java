@@ -51,4 +51,7 @@ public class CategoryEntity {
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
     private List<CategoryEntity> children = new ArrayList<>();
+
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    private List<ProductEntity> products = new ArrayList<>();
 }

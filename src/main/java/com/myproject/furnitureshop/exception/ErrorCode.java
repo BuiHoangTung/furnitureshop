@@ -10,7 +10,6 @@ public enum ErrorCode {
     FIELD_NO_BLANK("FIELD-VAL-002", "This field can not be blank.", HttpStatus.BAD_REQUEST),
     FIELD_INVALID_FORMAT("FIELD-VAL-003", "Field format is invalid.", HttpStatus.BAD_REQUEST),
 
-
     /* Rate limit */
     MANY_REQUEST("RATE-LIM-BUS-001", "Rate limit exceeded for this endpoint", HttpStatus.TOO_MANY_REQUESTS),
 
@@ -70,9 +69,6 @@ public enum ErrorCode {
     OTP_SEND_FAILED("OTP-SYS-006", "Failed to send OTP. Please try again later.", HttpStatus.INTERNAL_SERVER_ERROR),
     OTP_VERIFICATION_INVALID("OTP-SYS-007", "OTP verification is invalid or expired.", HttpStatus.BAD_REQUEST),
 
-    /* External API failures, payment gateway, 3rd-party service issues */
-    TURNSTILE_INVALID_TOKEN("TURNSTILE-INT-001", "Token timeout or duplicate", HttpStatus.BAD_REQUEST),
-
     /* Category domain exception */
     CAT_PARENT_REQUIRED("CAT-BUS-001", "Category parent is mandatory.", HttpStatus.BAD_REQUEST),
     CAT_NOT_FOUND("CAT-BUS-002", "Category not found.", HttpStatus.BAD_REQUEST),
@@ -99,8 +95,61 @@ public enum ErrorCode {
 
     INVALID_FILE_TYPE("FILE-VAL-001", "Invalid file type.", HttpStatus.BAD_REQUEST),
     INVALID_FILE_SIZE("FILE-VAL-002", "Invalid file size.", HttpStatus.BAD_REQUEST),
-    FILE_REQUIRED("FILE-VAL-003", "File upload can not be null.", HttpStatus.BAD_REQUEST)
+    FILE_REQUIRED("FILE-VAL-003", "File upload can not be null.", HttpStatus.BAD_REQUEST),
 
+    /* Product domain exception */
+    PRODUCT_NAME_REQUIRED("PROD-VAL-001", "Name of product is mandatory.", HttpStatus.BAD_REQUEST),
+    PRODUCT_NAME_LENGTH("PROD-VAL-002", "Product name must be between 10 and 100 characters.", HttpStatus.BAD_REQUEST),
+    PRODUCT_SKUS_SIZE("PROD-VAL-003", "Product must contain between 1 and 5 SKUs.", HttpStatus.BAD_REQUEST),
+    PRODUCT_SKUS_REQUIRED("PROD-VAL-004", "Product must contain at least one SKU.", HttpStatus.BAD_REQUEST),
+
+    /* Sku domain exception */
+    SKU_TITLE_REQUIRED("SKU-VAL-001", "Title of sku is mandatory.", HttpStatus.BAD_REQUEST),
+    SKU_TITLE_SIZE("SKU-VAL-002", "Title of sku must be between 3 and 255 characters.", HttpStatus.BAD_REQUEST),
+    SKU_PRICE_REQUIRED("SKU-VAL-003", "Price of sku is mandatory.", HttpStatus.BAD_REQUEST),
+    SKU_PRICE_MIN("SKU-VAL-004", "Price of sku must be at least 100.000VNĐ", HttpStatus.BAD_REQUEST),
+    SKU_PRICE_FORMAT("SKU-VAL-005", "Price must contain up to 13 integer digits and 2 decimal places.", HttpStatus.BAD_REQUEST),
+    SKU_QUANTITY_REQUIRED("SKU-VAL-006", "Sku quantity is mandatory.", HttpStatus.BAD_REQUEST),
+    SKU_QUANTITY_MIN("SKU-VAL-007", "Sku quantity must be at least 1.", HttpStatus.BAD_REQUEST),
+    SKU_DESC_REQUIRED("SKU-VAL-008", "Sku description is mandatory.", HttpStatus.BAD_REQUEST),
+    SKU_DETAIL_DESC_REQUIRED("SKU-VAL-009", "Sku detail description is mandatory.", HttpStatus.BAD_REQUEST),
+    SKU_DESC_LENGTH("SKU-VAL-010", "Sku description must be between 100 and 500 characters.", HttpStatus.BAD_REQUEST),
+    SKU_DETAIL_DESC_LENGTH("SKU-VAL-011", "Sku detail description must be between 200 and 1500 characters.", HttpStatus.BAD_REQUEST),
+    SKU_OPT_VAL_REQUIRED("SKU-VAL-012", "List of Option value of sku is mandatory.", HttpStatus.BAD_REQUEST),
+    SKU_OPT_VAL_SIZE("SKU-VAL-013", "List of Option value of sku must be between 1 and 3.", HttpStatus.BAD_REQUEST),
+    SKU_WEIGHT_REQUIRED("SKU-VAL-014", "Weight of sku is mandatory.", HttpStatus.BAD_REQUEST),
+    SKU_WIDTH_REQUIRED("SKU-VAL-015", "Width of sku is mandatory.", HttpStatus.BAD_REQUEST),
+    SKU_HEIGHT_REQUIRED("SKU-VAL-016", "Height of sku is mandatory.", HttpStatus.BAD_REQUEST),
+    SKU_DEPTH_REQUIRED("SKU-VAL-017", "Depth of sku is mandatory.", HttpStatus.BAD_REQUEST),
+    SKU_WEIGHT_MIN("SKU-VAL-018", "Weight must be greater than 0.", HttpStatus.BAD_REQUEST),
+    SKU_WIDTH_MIN("SKU-VAL-019", "Width must be greater than 0.", HttpStatus.BAD_REQUEST),
+    SKU_HEIGHT_MIN("SKU-VAL-020", "Height must be greater than 0.", HttpStatus.BAD_REQUEST),
+    SKU_DEPTH_MIN("SKU-VAL-021", "Depth must be greater than 0.", HttpStatus.BAD_REQUEST),
+    SKU_WEIGHT_FORMAT("SKU-VAL-022", "Price must contain up to 8 integer digits and 2 decimal places.", HttpStatus.BAD_REQUEST),
+    SKU_WIDTH_FORMAT("SKU-VAL-023", "Price must contain up to 8 integer digits and 2 decimal places.", HttpStatus.BAD_REQUEST),
+    SKU_HEIGHT_FORMAT("SKU-VAL-024", "Price must contain up to 8 integer digits and 2 decimal places.", HttpStatus.BAD_REQUEST),
+    SKU_DEPTH_FORMAT("SKU-VAL-025", "Price must contain up to 8 integer digits and 2 decimal places.", HttpStatus.BAD_REQUEST),
+
+    SKU_SPECIFICATION_REQUIRED("SKU-VAL-026", "List of specification is mandatory.", HttpStatus.BAD_REQUEST),
+    SKU_SPECIFICATION_SIZE("SKU-VAL-027", "List of specification must be between 1 and 20.", HttpStatus.BAD_REQUEST),
+
+    /* Option + Value domain exception */
+    OPT_NAME_REQUIRED("OPT-VAL-001", "Name of option is mandatory.", HttpStatus.BAD_REQUEST),
+    OPT_NAME_SIZE("OPT-VAL-002", "Name of option must be between 3 and 100 character.", HttpStatus.BAD_REQUEST),
+    OPT_VALUE_REQUIRED("OPT-VAL-003", "Value of option is mandatory.", HttpStatus.BAD_REQUEST),
+    OPT_VALUE_SIZE("OPT-VAL-004", "Value of option must be between 3 and 50 character.", HttpStatus.BAD_REQUEST),
+
+    OPT_ALREADY_EXISTS("OPT-BUS-001", "Shop option is already exists.", HttpStatus.BAD_REQUEST),
+    OPT_NOT_FOUND("OPT-BUS-002", "Shop option not found.", HttpStatus.BAD_REQUEST),
+
+    /* Sku Attribute domain exception */
+    SPE_NAME_REQUIRED("SPE-VAL-001", "Name of specification attribute is mandatory.", HttpStatus.BAD_REQUEST),
+    SPE_NAME_SIZE("SPE-VAL-002", "Name of specification attribute must be between 3 and 255 character.", HttpStatus.BAD_REQUEST),
+    SPE_VALUE_REQUIRED("SPE-VAL-003", "Value of specification attribute is mandatory.", HttpStatus.BAD_REQUEST),
+    SPE_VALUE_SIZE("SPE-VAL-004", "Value of specification attribute must be between 3 and 255 character.", HttpStatus.BAD_REQUEST),
+
+    /* External API failures, payment gateway, 3rd-party service issues */
+    TURNSTILE_INVALID_TOKEN("TURNSTILE-INT-001", "Token timeout or duplicate", HttpStatus.BAD_REQUEST)
     ;
     ErrorCode(String errorCode, String message, HttpStatus httpStatus) {
         this.errorCode = errorCode;
