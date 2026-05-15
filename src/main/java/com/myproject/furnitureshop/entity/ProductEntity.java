@@ -1,5 +1,6 @@
 package com.myproject.furnitureshop.entity;
 
+import com.myproject.furnitureshop.enums.ProductStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +32,10 @@ public class ProductEntity {
 
     @Column(name = "deleted_at")
     private Instant deletedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private ProductStatus status;
 
     @ManyToOne
     @JoinColumn(name = "id_category")

@@ -1,5 +1,6 @@
 package com.myproject.furnitureshop.entity;
 
+import com.myproject.furnitureshop.enums.SkuStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -63,6 +64,10 @@ public class SkuEntity {
 
     @Column(name = "deleted_at")
     private Instant deletedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private SkuStatus status;
 
     @ManyToOne
     @JoinColumn(name = "id_product")
