@@ -1,6 +1,5 @@
 package com.myproject.furnitureshop.controller;
 
-import com.myproject.furnitureshop.enums.BusinessDirectoryPath;
 import com.myproject.furnitureshop.service.FileStorageService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;

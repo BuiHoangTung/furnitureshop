@@ -11,6 +11,7 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FileStorageResponse {
     private Long id;
+    private String objectKey;
     private String url;
     private long size;
     private String contentType;

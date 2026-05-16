@@ -6,7 +6,7 @@ import com.myproject.furnitureshop.exception.AppException;
 import com.myproject.furnitureshop.exception.ErrorCode;
 import com.myproject.furnitureshop.service.FileStorageService;
 import com.myproject.furnitureshop.service.VirusScanService;
-import org.apache.commons.io.FilenameUtils;
+import com.myproject.furnitureshop.utils.FileHelper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -28,15 +28,11 @@ public class FileStorageServiceImp implements FileStorageService {
     private String root;
 
     private final VirusScanService virusScanService;
+    private final FileHelper fileHelper;
 
-    public FileStorageServiceImp(VirusScanService virusScanService) {
+    public FileStorageServiceImp(VirusScanService virusScanService, FileHelper fileHelper) {
         this.virusScanService = virusScanService;
-    }
-
-    private String getFileExtension(String fileName) {
-        if(fileName == null || fileName.isEmpty()) return "";
-
-        return FilenameUtils.getExtension(fileName);
+        this.fileHelper = fileHelper;
     }
 
     @Override
@@ -58,7 +54,7 @@ public class FileStorageServiceImp implements FileStorageService {
         try {
             Files.createDirectories(rootPath);
 
-            String ext = getFileExtension(file.getOriginalFilename());
+            String ext = this.fileHelper.getFileExtension(file.getOriginalFilename());
             String newFileName = UUID.randomUUID() + (ext.isEmpty() ? "" : "." + ext);
 
             Path target = rootPath.resolve(newFileName);
@@ -66,8 +62,6 @@ public class FileStorageServiceImp implements FileStorageService {
             try (InputStream inputStream = file.getInputStream()) {
                 Files.copy(inputStream, target);
             }
-
-//            String url = this.appBaseUrl + "/file/" + directoryPath + "/" + newFileName;
 
             String url = directoryPath + "/" + newFileName;
 

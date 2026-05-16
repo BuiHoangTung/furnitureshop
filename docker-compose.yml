@@ -16,6 +16,7 @@ services:
   redis:
     image: redis:trixie
     container_name: redis_furnitureshop
+    command: redis-server --appendonly yes
     ports:
       - "6379:6379"
     volumes:
@@ -55,6 +56,26 @@ services:
     container_name: clamav_furnitureshop
     ports:
       - "3310:3310"
+    networks:
+      - backend_network
+    restart: unless-stopped
+
+  minio:
+    image: quay.io/minio/aistor/minio:RELEASE.2026-05-04T23-02-27Z
+    container_name: minio_furnitureshop
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_NAME}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - ./docker-data/minio:/data
+      - "${MINIO_LICENSE_PATH}:/license/minio.license:ro"
+    command: >
+      server /data 
+      --console-address ":9001"
+      --license /license/minio.license
     networks:
       - backend_network
     restart: unless-stopped
